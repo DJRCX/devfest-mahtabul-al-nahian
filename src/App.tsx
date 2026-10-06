@@ -1,5 +1,6 @@
-import { useReducer } from 'react'
+import { useEffect, useReducer } from 'react'
 import { appReducer, initialAppState } from './lib/state'
+import { sampleRequirements } from './lib/sampleData'
 import { useT } from './i18n/useT'
 import { LanguageToggle } from './components/LanguageToggle'
 import { RequirementsLoader } from './components/RequirementsLoader'
@@ -12,6 +13,17 @@ import { GeneratePanel } from './components/GeneratePanel'
 export default function App() {
   const [state, dispatch] = useReducer(appReducer, initialAppState)
   const { language, t } = useT()
+
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search)
+      if (params.get('sample') === 'true') {
+        dispatch({ type: 'SET_REQUIREMENTS', payload: sampleRequirements })
+      }
+    } catch {
+      // ignore
+    }
+  }, [])
 
   return (
     <div className="min-h-screen bg-slate-100/70 text-slate-900 pb-16">

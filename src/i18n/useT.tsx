@@ -16,6 +16,10 @@ const I18nContext = createContext<I18nContextType | null>(null)
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(() => {
     try {
+      const params = new URLSearchParams(window.location.search)
+      const qLang = params.get('lang')
+      if (qLang === 'en' || qLang === 'bn') return qLang
+
       const saved = localStorage.getItem(STORAGE_KEY)
       if (saved === 'en' || saved === 'bn') return saved
     } catch {
