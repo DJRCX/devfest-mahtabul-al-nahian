@@ -7,6 +7,7 @@ import { TenderSummary } from './components/TenderSummary'
 import { FileUploader } from './components/FileUploader'
 import { FileList } from './components/FileList'
 import { Checklist } from './components/Checklist'
+import { GeneratePanel } from './components/GeneratePanel'
 
 export default function App() {
   const [state, dispatch] = useReducer(appReducer, initialAppState)
@@ -194,13 +195,17 @@ export default function App() {
         {/* Step 4: Generate Package */}
         <section
           className={`rounded-2xl border bg-white p-6 shadow-xs transition ${
-            state.files.length > 0 ? 'border-slate-200 opacity-100' : 'border-slate-200/60 opacity-60'
+            state.tender ? 'border-slate-200 opacity-100' : 'border-slate-200/60 opacity-60'
           }`}
         >
           <div className="mb-4 flex items-start justify-between border-b border-slate-100 pb-4">
             <div>
               <div className="flex items-center gap-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-300 text-xs font-bold text-slate-700">
+                <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
+                  state.tender && state.files.length > 0
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-300 text-slate-700'
+                }`}>
                   4
                 </span>
                 <h2 className="text-lg font-bold text-slate-900">{t('step4Title')}</h2>
@@ -209,9 +214,21 @@ export default function App() {
             </div>
           </div>
 
-          <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/50 p-8 text-center text-sm text-slate-500">
-            {t('generateTitle')}
-          </div>
+          {state.tender ? (
+            <GeneratePanel
+              tender={state.tender}
+              requirements={state.requirements}
+              files={state.files}
+              matches={state.matches}
+              expiries={state.expiries}
+            />
+          ) : (
+            <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/50 p-8 text-center text-sm text-slate-500">
+              {language === 'bn'
+                ? 'প্যাকেজ প্রস্তুত করতে অনুগ্রহ করে ধাপ ১-এ requirements.json লোড করুন।'
+                : 'Load requirements.json in Step 1 to begin package generation.'}
+            </div>
+          )}
         </section>
       </main>
     </div>
