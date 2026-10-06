@@ -183,6 +183,7 @@ export default function App() {
 
           {state.tender && state.requirements.length > 0 ? (
             <Checklist
+              tender={state.tender}
               requirements={state.requirements}
               files={state.files}
               matches={state.matches}

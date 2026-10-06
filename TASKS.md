@@ -63,3 +63,9 @@ Source: `PLAN.md`
 - [x] Add `TASKS.md` to repository
 - [x] **Commit 4** & final Vercel deploy
 - [x] Final eligible commit before T+90
+
+## 8. Bonus Tasks (Implemented)
+- [x] **Index page after the cover**: Document schedule showing starting page number for each document (17 pages total with index page).
+- [x] **Export checklist as CSV**: One-click download of `<tender_id>_Checklist.csv` with UTF-8 BOM encoding for Excel/CSV compatibility.
+- [x] **Bangla text on PDF**: High-resolution canvas rendering of Bengali typography and conjuncts embedded on PDF cover and index page.
+- [x] **Safe bad-file handling**: Graceful error catching for corrupt or password-protected PDFs without app crashing.

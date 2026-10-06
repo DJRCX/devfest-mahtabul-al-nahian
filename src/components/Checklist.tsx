@@ -1,10 +1,12 @@
 import type { ChangeEvent } from 'react'
-import type { Requirement, UploadedFile, Matches, Expiries } from '../lib/types'
+import type { Requirement, UploadedFile, Matches, Expiries, Tender } from '../lib/types'
 import { computeStatus } from '../lib/status'
+import { exportChecklistCsv } from '../lib/exportCsv'
 import { useT } from '../i18n/useT'
 import { getStatusLabel } from '../i18n/strings'
 
 interface ChecklistProps {
+  tender: Tender
   requirements: Requirement[]
   files: UploadedFile[]
   matches: Matches
@@ -15,6 +17,7 @@ interface ChecklistProps {
 }
 
 export function Checklist({
+  tender,
   requirements,
   files,
   matches,
@@ -105,8 +108,28 @@ export function Checklist({
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-xs">
-      <table className="min-w-full divide-y divide-slate-100 text-left text-sm">
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-1">
+        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+          {language === 'bn' ? 'দরপত্রের শর্তাবলি ও ফাইল সংযোগ' : 'Tender Documents & Status'}
+        </span>
+        <button
+          type="button"
+          onClick={() =>
+            exportChecklistCsv(tender, requirements, files, matches, expiries)
+          }
+          className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition shadow-2xs"
+          title="Download checklist summary as CSV spreadsheet"
+        >
+          <svg className="h-3.5 w-3.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span>{language === 'bn' ? 'এক্সপোর্ট চেকলিস্ট (CSV)' : 'Export Checklist (CSV)'}</span>
+        </button>
+      </div>
+
+      <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white shadow-xs">
+        <table className="min-w-full divide-y divide-slate-100 text-left text-sm">
         <thead className="bg-slate-50/70 text-xs font-semibold text-slate-600">
           <tr>
             <th className="px-3.5 py-3 text-center w-12">{t('colOrder')}</th>
@@ -245,5 +268,6 @@ export function Checklist({
         </tbody>
       </table>
     </div>
+  </div>
   )
 }

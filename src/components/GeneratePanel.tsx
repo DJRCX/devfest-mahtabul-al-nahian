@@ -21,6 +21,7 @@ export function GeneratePanel({
 }: GeneratePanelProps) {
   const { language, t } = useT()
   const [generating, setGenerating] = useState(false)
+  const [includeIndexPage, setIncludeIndexPage] = useState(true)
   const [lastGeneratedName, setLastGeneratedName] = useState<string | null>(null)
 
   if (!tender) {
@@ -56,7 +57,8 @@ export function GeneratePanel({
 
   const isBlocked = blockingIssues.length > 0 || matchedDocsCount === 0
   const expectedFileName = `${tender.tender_id}_Package.pdf`
-  const totalPackagePages = totalDocPages + 1 // + 1 cover page
+  const extraPages = includeIndexPage ? 2 : 1
+  const totalPackagePages = totalDocPages + extraPages
 
   const handleGenerate = async () => {
     if (isBlocked || generating) return
@@ -68,6 +70,7 @@ export function GeneratePanel({
         requirements,
         files,
         matches,
+        includeIndexPage,
       })
 
       // Trigger browser download via Blob and <a download>
@@ -178,8 +181,25 @@ export function GeneratePanel({
         </div>
       )}
 
-      {/* Action Button */}
+      {/* Action Button & Options */}
       <div className="flex flex-col items-center justify-center gap-3 pt-2">
+        <label className="inline-flex items-center gap-2 text-xs font-semibold text-slate-700 cursor-pointer bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 hover:bg-slate-100 transition shadow-2xs">
+          <input
+            type="checkbox"
+            checked={includeIndexPage}
+            onChange={(e) => setIncludeIndexPage(e.target.checked)}
+            className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 accent-blue-600 cursor-pointer"
+          />
+          <span>
+            {language === 'bn'
+              ? 'কভারের পর সূচিপত্র পৃষ্ঠা (Index Page) যুক্ত করুন'
+              : 'Include Index Page after Cover (with starting page numbers)'}
+          </span>
+          <span className="rounded bg-blue-100 px-1.5 py-0.5 text-[10px] text-blue-800 uppercase font-bold">
+            Bonus
+          </span>
+        </label>
+
         <button
           type="button"
           onClick={handleGenerate}
