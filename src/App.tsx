@@ -58,7 +58,7 @@ export default function App() {
                 onClick={() => dispatch({ type: 'RESET_ALL' })}
                 className="rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition"
               >
-                Reset All
+                {language === 'bn' ? 'সব মুছে ফেলুন' : 'Reset All'}
               </button>
             )}
             <LanguageToggle />
@@ -82,7 +82,7 @@ export default function App() {
             </div>
             {state.tender && (
               <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200/60">
-                ✓ Loaded
+                ✓ {language === 'bn' ? 'লোড হয়েছে' : 'Loaded'}
               </span>
             )}
           </div>

@@ -59,7 +59,7 @@ Source: `PLAN.md`
 - [x] Take `screenshots/` (checklist statuses in English and Bangla)
 
 ## 7. README and final delivery (T+65 to T+90)
-- [x] README: name (no registration number needed), live HTTPS link, run instructions (`npm install`, `npm run dev`, `npm run build`), features and bonus features, known problems, AI tools used, most useful prompt
+- [x] README: name and registration number (rulebook 9.3), live HTTPS link, run instructions (`npm install`, `npm run dev`, `npm run build`), features and bonus features, known problems, AI tools used, most useful prompt
 - [x] Add `TASKS.md` to repository
 - [x] **Commit 4** & final Vercel deploy
 - [x] Final eligible commit before T+90

@@ -39,7 +39,6 @@ export function appReducer(state: AppState, action: AppAction): AppState {
       return {
         ...state,
         files: [...state.files, ...action.files],
-        uploadError: null,
       }
     }
 

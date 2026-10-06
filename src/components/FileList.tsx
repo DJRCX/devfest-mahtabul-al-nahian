@@ -19,17 +19,11 @@ export function FileList({ files, onRemoveFile }: FileListProps) {
     return null
   }
 
-  // Map to identify first occurrence of each SHA-256 hash
-  const hashToFirstFile = new Map<string, UploadedFile>()
-  const duplicates = new Map<string, string>() // fileId -> firstFileName
-
+  // Every file whose SHA-256 matches another file is marked, listing the other copies
+  const duplicates = new Map<string, string>() // fileId -> names of identical files
   files.forEach((f) => {
-    if (hashToFirstFile.has(f.hash)) {
-      const first = hashToFirstFile.get(f.hash)!
-      duplicates.set(f.id, first.name)
-    } else {
-      hashToFirstFile.set(f.hash, f)
-    }
+    const others = files.filter((o) => o.id !== f.id && o.hash === f.hash).map((o) => o.name)
+    if (others.length > 0) duplicates.set(f.id, others.join(', '))
   })
 
   const totalPages = files.reduce((acc, f) => acc + f.pageCount, 0)
@@ -99,7 +93,8 @@ export function FileList({ files, onRemoveFile }: FileListProps) {
                   </div>
                   <div className="flex items-center gap-2 text-xs text-slate-500">
                     <span>
-                      {file.pageCount} {t('summaryOrder') === 'ক্রম' ? 'পৃষ্ঠা' : 'pages'}
+                      {file.pageCount}{' '}
+                      {language === 'bn' ? 'পৃষ্ঠা' : file.pageCount === 1 ? 'page' : 'pages'}
                     </span>
                     <span>•</span>
                     <span>{formatBytes(file.size)}</span>

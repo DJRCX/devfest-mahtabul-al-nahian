@@ -84,9 +84,11 @@ export async function readPdf(file: File): Promise<ReadPdfResult> {
 
   // 4. Count pages using PDFDocument.load
   let pageCount = 0
+  let isEncrypted = false
   try {
     const doc = await PDFDocument.load(bytes, { ignoreEncryption: true })
     pageCount = doc.getPageCount()
+    isEncrypted = doc.isEncrypted
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err)
     return {
@@ -94,6 +96,17 @@ export async function readPdf(file: File): Promise<ReadPdfResult> {
       error: {
         en: `Cannot process "${file.name}": Damaged or unreadable PDF (${msg}).`,
         bn: `"${file.name}" প্রক্রিয়াকরণ করা সম্ভব নয়: ফাইলটি ত্রুটিপূর্ণ বা সুরক্ষিত (${msg})।`,
+      },
+    }
+  }
+
+  // pdf-lib cannot decrypt, so encrypted pages would be copied as blank pages
+  if (isEncrypted) {
+    return {
+      success: false,
+      error: {
+        en: `Rejected "${file.name}": The PDF is password-protected or encrypted. Please upload an unprotected copy.`,
+        bn: `"${file.name}" বাতিল করা হয়েছে: পিডিএফটি পাসওয়ার্ড-সুরক্ষিত বা এনক্রিপ্ট করা। অনুগ্রহ করে সুরক্ষাবিহীন কপি আপলোড করুন।`,
       },
     }
   }

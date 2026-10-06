@@ -85,6 +85,15 @@ export function RequirementsLoader({
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onClick={() => fileInputRef.current?.click()}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            fileInputRef.current?.click()
+          }
+        }}
+        role="button"
+        tabIndex={0}
+        aria-label={t('dragDropJson')}
         className={`relative flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 text-center transition ${
           isDragging
             ? 'border-blue-500 bg-blue-50/60'

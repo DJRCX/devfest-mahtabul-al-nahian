@@ -87,7 +87,9 @@ export function GeneratePanel({
       setLastGeneratedName(expectedFileName)
     } catch (err) {
       console.error('Error generating package:', err)
-      alert(`Error generating PDF package: ${err instanceof Error ? err.message : String(err)}`)
+      alert(
+        `${language === 'bn' ? 'প্যাকেজ তৈরিতে ত্রুটি' : 'Error generating PDF package'}: ${err instanceof Error ? err.message : String(err)}`,
+      )
     } finally {
       setGenerating(false)
     }
@@ -196,7 +198,7 @@ export function GeneratePanel({
               : 'Include Index Page after Cover (with starting page numbers)'}
           </span>
           <span className="rounded bg-blue-100 px-1.5 py-0.5 text-[10px] text-blue-800 uppercase font-bold">
-            Bonus
+            {language === 'bn' ? 'বোনাস' : 'Bonus'}
           </span>
         </label>
 

@@ -97,6 +97,16 @@ export function FileUploader({ files, onAddFiles, onError, disabled }: FileUploa
         }}
         onDragLeave={() => setIsDragging(false)}
         onClick={() => !disabled && !processing && fileInputRef.current?.click()}
+        onKeyDown={(e) => {
+          if ((e.key === 'Enter' || e.key === ' ') && !disabled && !processing) {
+            e.preventDefault()
+            fileInputRef.current?.click()
+          }
+        }}
+        role="button"
+        tabIndex={disabled ? -1 : 0}
+        aria-disabled={disabled || processing}
+        aria-label={t('dragDropPdfs')}
         className={`relative flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 text-center transition ${
           disabled
             ? 'cursor-not-allowed border-slate-200 bg-slate-50 opacity-60'

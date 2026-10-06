@@ -32,6 +32,11 @@ export async function buildPackage({
   const helvetica = await mergedDoc.embedFont(StandardFonts.Helvetica)
   const helveticaBold = await mergedDoc.embedFont(StandardFonts.HelveticaBold)
 
+  // Helvetica (WinAnsi) throws on characters it cannot encode, e.g. Bangla file names
+  const winAnsiChars = new Set(helvetica.getCharacterSet())
+  const safe = (text: string) =>
+    Array.from(text, (ch) => (winAnsiChars.has(ch.codePointAt(0) ?? 0) ? ch : '?')).join('')
+
   // 1. Filter and sort included requirements (only those with a matched file)
   const sortedReqs = [...requirements].sort((a, b) => a.order - b.order)
   const includedDocs: IncludedDocumentInfo[] = []
@@ -115,7 +120,8 @@ export async function buildPackage({
     borderWidth: 1,
   })
 
-  const today = new Date().toISOString().slice(0, 10)
+  const now = new Date()
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
   const metaLines = [
     { label: 'Tender ID:', val: tender.tender_id, bold: true },
     { label: 'Tender Title:', val: tender.title, bold: false },
@@ -134,7 +140,7 @@ export async function buildPackage({
       font: helveticaBold,
       color: rgb(0.2, 0.25, 0.35),
     })
-    coverPage.drawText(item.val, {
+    coverPage.drawText(safe(item.val), {
       x: 180,
       y: curY,
       size: 9.5,
@@ -192,7 +198,7 @@ export async function buildPackage({
     })
 
     const reqLabel = `${doc.reqId} - ${doc.title_en}`
-    coverPage.drawText(reqLabel.slice(0, 36), {
+    coverPage.drawText(safe(reqLabel.slice(0, 36)), {
       x: 75,
       y: rowY,
       size: 8.5,
@@ -200,7 +206,7 @@ export async function buildPackage({
       color: rgb(0.15, 0.15, 0.15),
     })
 
-    coverPage.drawText(doc.fileName.slice(0, 44), {
+    coverPage.drawText(safe(doc.fileName.slice(0, 44)), {
       x: 260,
       y: rowY,
       size: 8.5,
@@ -329,7 +335,7 @@ export async function buildPackage({
       })
 
       const reqLabel = `${doc.reqId} - ${doc.title_en}`
-      indexPage.drawText(reqLabel.slice(0, 34), {
+      indexPage.drawText(safe(reqLabel.slice(0, 34)), {
         x: 75,
         y: idxRowY,
         size: 8.5,
@@ -355,7 +361,7 @@ export async function buildPackage({
         }
       }
 
-      indexPage.drawText(doc.fileName.slice(0, 32), {
+      indexPage.drawText(safe(doc.fileName.slice(0, 32)), {
         x: 260,
         y: idxRowY,
         size: 8.5,
@@ -395,7 +401,7 @@ export async function buildPackage({
     let srcDoc: PDFDocument
     try {
       srcDoc = await PDFDocument.load(file.bytes, { ignoreEncryption: true })
-    } catch (err: unknown) {
+    } catch {
       throw new Error(`Failed to load file "${file.name}": Damaged or password-protected PDF.`)
     }
 
@@ -443,7 +449,7 @@ export async function buildPackage({
   for (let i = 0; i < totalPages; i++) {
     const page = allPages[i]
     const meta = pageMetas[i]
-    const footerText = `${tender.tender_id} | Page ${i + 1} of ${totalPages}`
+    const footerText = safe(`${tender.tender_id} | Page ${i + 1} of ${totalPages}`)
     const textWidth = helvetica.widthOfTextAtSize(footerText, footerFontSize)
 
     if (meta.isSpecial) {
