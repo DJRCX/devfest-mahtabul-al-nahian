@@ -4,13 +4,15 @@ import { useT } from './i18n/useT'
 import { LanguageToggle } from './components/LanguageToggle'
 import { RequirementsLoader } from './components/RequirementsLoader'
 import { TenderSummary } from './components/TenderSummary'
+import { FileUploader } from './components/FileUploader'
+import { FileList } from './components/FileList'
 
 export default function App() {
   const [state, dispatch] = useReducer(appReducer, initialAppState)
-  const { t } = useT()
+  const { language, t } = useT()
 
   return (
-    <div className="min-h-screen bg-slate-100/70 text-slate-900">
+    <div className="min-h-screen bg-slate-100/70 text-slate-900 pb-16">
       {/* Header */}
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur-sm shadow-xs">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
@@ -36,13 +38,13 @@ export default function App() {
           </div>
 
           <div className="flex items-center gap-3">
-            {state.tender && (
+            {(state.tender || state.files.length > 0) && (
               <button
                 type="button"
                 onClick={() => dispatch({ type: 'RESET_ALL' })}
                 className="rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition"
               >
-                Reset
+                Reset All
               </button>
             )}
             <LanguageToggle />
@@ -93,24 +95,60 @@ export default function App() {
           <div className="mb-4 flex items-start justify-between border-b border-slate-100 pb-4">
             <div>
               <div className="flex items-center gap-2">
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-300 text-xs font-bold text-slate-700">
+                <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
+                  state.files.length > 0 ? 'bg-emerald-600 text-white' : 'bg-blue-600 text-white'
+                }`}>
                   2
                 </span>
                 <h2 className="text-lg font-bold text-slate-900">{t('step2Title')}</h2>
               </div>
               <p className="mt-1 text-sm text-slate-500">{t('step2Desc')}</p>
             </div>
+            {state.files.length > 0 && (
+              <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-200/60">
+                {state.files.length} / 30 {language === 'bn' ? 'ফাইল' : 'files'}
+              </span>
+            )}
           </div>
 
-          <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50/50 p-8 text-center text-sm text-slate-500">
-            {state.tender ? t('dragDropPdfs') : 'Complete Step 1 to upload documents.'}
+          <div className="space-y-4">
+            <FileUploader
+              files={state.files}
+              onAddFiles={(files) => dispatch({ type: 'ADD_FILES', files })}
+              onError={(error) => dispatch({ type: 'SET_UPLOAD_ERROR', error })}
+              disabled={!state.tender}
+            />
+
+            {state.uploadError && (
+              <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700 flex items-start gap-2">
+                <svg className="h-5 w-5 text-red-500 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div className="flex-1">
+                  <p className="font-medium">{language === 'en' ? 'Upload Warning' : 'আপলোড ত্রুটি'}</p>
+                  <p className="mt-0.5 text-xs text-red-600">{state.uploadError[language]}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => dispatch({ type: 'SET_UPLOAD_ERROR', error: null })}
+                  className="text-red-400 hover:text-red-600 text-xs font-bold"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+
+            <FileList
+              files={state.files}
+              onRemoveFile={(fileId) => dispatch({ type: 'REMOVE_FILE', fileId })}
+            />
           </div>
         </section>
 
         {/* Step 3: Match & Verify */}
         <section
           className={`rounded-2xl border bg-white p-6 shadow-xs transition ${
-            state.tender ? 'border-slate-200 opacity-100' : 'border-slate-200/60 opacity-60'
+            state.files.length > 0 ? 'border-slate-200 opacity-100' : 'border-slate-200/60 opacity-60'
           }`}
         >
           <div className="mb-4 flex items-start justify-between border-b border-slate-100 pb-4">
@@ -133,7 +171,7 @@ export default function App() {
         {/* Step 4: Generate Package */}
         <section
           className={`rounded-2xl border bg-white p-6 shadow-xs transition ${
-            state.tender ? 'border-slate-200 opacity-100' : 'border-slate-200/60 opacity-60'
+            state.files.length > 0 ? 'border-slate-200 opacity-100' : 'border-slate-200/60 opacity-60'
           }`}
         >
           <div className="mb-4 flex items-start justify-between border-b border-slate-100 pb-4">
